@@ -1,0 +1,15 @@
+If you're going to be doing anything custom with graphics, it'll involve a shader at some point.
+
+This is a workshop designed to introduce shaders within the context of college club game development. Most club projects are 2D due to scoping, so that's where the focus of this workshop will be.
+
+Starting point: Meshes.
+
+A mesh has a set of vertices, and a set of triangles. Triangles only list their three vertices, and contain no other data. Vertices contain all other data (position, vertex colors, normals, uv coordinates), which is then interpolated over triangles.
+There can be multiple vertices with the same position. This is used to create hard edges between triangles (example: cube)
+
+This workshop will deal with vertex-fragment shaders. In a vertex-fragment shader, there is a vertex function which is run on each vertex, and a fragment shader which outputs a color for each pixel (fragment) in a triangle, using interpolated data.
+There are other types of shaders. Geometry shaders allow you to create new vertices and triangles within the GPU, and compute shaders allow you to run non-rendering computations on the GPU.
+
+So, to start off: Documentation. Unity publishes the code for their included shaders and shader libraries in their download archive. Use the dropdown to select "Built-in shader"
+There are also built-in functions to CG, the shader language Unity uses at http://http.developer.nvidia.com/CgTutorial/cg_tutorial_appendix_e.html
+
