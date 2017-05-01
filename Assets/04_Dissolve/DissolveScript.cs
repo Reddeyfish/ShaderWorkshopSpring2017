@@ -21,7 +21,7 @@ public class DissolveScript : MonoBehaviour {
         instancedData.SetFloat("_AlphaThreshold", alphaThreshold);
 
         float colorOffset = Mathf.Min(alphaThreshold, 1 - alphaThreshold); //value is the distance to the nearest whole number
-        colorOffset /= 2; //scale the output range from [0..0.5] to [0..0.25]
+        colorOffset /= 4; //scale the output range from [0..0.5] to [0..0.125]
         instancedData.SetFloat("_ColorOffset", colorOffset);
 
         rend.SetPropertyBlock(instancedData);

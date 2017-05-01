@@ -1,0 +1,47 @@
+<Open the Smallest Shader>
+This is a shader made as small as possible. <Highlight CGPROGRAM blocks> Everything inside the CGPROGRAM blocks is written
+in C for graphics, which is Nvidia's shader language. Everything outside this block is in Unity's ShaderLab syntax, which is specific to Unity.
+Almost all of the concepts in Shaderlab correspond to features in other APIs.
+
+So, to start at the top:
+Shader "Custom/Smallest" declares the name of the shader in this file. If you go to choose a shader <Create material>, it'll appear in that path. <Give example>
+
+The next is the SubShader block. Everything inside a subshader block represents a complete shader. If a subshader is incompatible on a certain machine,
+the one below it will be used. If none are valid, the Fallback statement at the end will use subshaders from a different file.
+
+Inside that is the Pass block. Each pass block renders the entire object once. Multiple passes are usually used for lighting, but can also be used for assorted visual effects.
+
+Now we are in the CGPROGRAM block. hashtag lines are instructions to the compiler. For this, we're telling the compiler that we have a vertex function named "vert_img",
+a fragment function named "frag", and we'll be using the library "UnityCG.cginc".
+
+"UnityCG.cginc" defines the code for our vertex function vert_img, so we don't have to go over that yet.
+
+our fragment function takes as input a struct named v2f_img. This is a stuct representing the data transferred from the vertex function to the fragment function, and is also defined 
+in "UnityCG.cginc". It has a return type of fixed4, which represents a vector with 4 components. : SV_TARGET at the end marks the return value as being a color value.
+
+Inside the function, we create a fixed4 vector representing the color red, and return it. All colors are in the zero to one range, so 000 is black and 111 is white. All colors also include an alpha component, even if the shader doesn't take it into account.
+
+<Create material, and apply it>
+
+<Change color, show difference, Change alpha, show no difference>
+
+===Now Creating Alpha Shader===
+
+To have the shader take alpha into account, we need to add a few lines.
+<New Shader, Custom/Alpha>
+
+<Add
+	Blend SrcAlpha OneMinusSrcAlpha
+	ZWrite Off
+	ZTest LEqual
+	Lighting Off
+>
+
+These keywords set up the shader to use alpha blending. Once the object has been rendered, it needs to be combined with the scene.
+The resulting color is the rendered color times it's alpha, plus the background color times oneMinusSourceAlpha. You can set up different blending modes.
+For example, Additive blending is Blend One One to add the two together.
+
+ZTest states that we'll only render if we are closer to the camera than any occluding objects.
+ZWrite off states that the rendered object won't occlude objects.
+
+<Create Material, apply it>

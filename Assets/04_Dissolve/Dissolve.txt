@@ -1,0 +1,3 @@
+There are other attributes besides [PerRendererData]. For example, currently the scale and offset inputs don't actually do anything. We can remove these using the
+[NoScaleOffset] attribute, but we can also make them functional by adding a vertex function.
+

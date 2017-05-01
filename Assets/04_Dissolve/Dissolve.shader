@@ -46,12 +46,25 @@
                     fixed testValue = tex2D(_ThresholdMap, i.uv).r;
                     //sample from threshold map. It is greyscale, so we only need one value
 
+                    /*
+                    if(testValue < _AlphaThreshold) {
+                        return fixed4(0, 0, 0, 0);
+                    } else {
+                        fixed4 textureCol = tex2D(_MainTex, i.uv);
+                        if(testValue < _AlphaThreshold + _ColorOffset) {
+                            return fixed4(_Color.rgb, _Color.a * textureCol.a);
+                        } else {
+                            return textureCol;
+                        }
+                    }
+                    */
+                    ///*
+                    fixed4 textureCol = tex2D(_MainTex, i.uv);
+                    //sample from the current texture
+
                     fixed alphaThresholdPassed = step(_AlphaThreshold, testValue);
                     fixed colorThresholdPassed = step(_AlphaThreshold + _ColorOffset, testValue);
                     //these values will be one if the test value is over the threshold, zero otherwise.
-
-                    fixed4 textureCol = tex2D(_MainTex, i.uv);
-                    //sample from the current texture
 
                     fixed4 solidColor = fixed4(_Color.rgb, _Color.a * textureCol.a);
                     //the solid color to use if the color threshold was failed. Multiplying by texture alpha ensures that the color is transparent where the texture is transparent
@@ -65,6 +78,7 @@
                     //alpha component will remain unchanged if threshold map passes the alpha threshold, will be set to zero otherwise.
 
                     return outputColor;
+                    //*/
                 }
             ENDCG
         }

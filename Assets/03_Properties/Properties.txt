@@ -1,0 +1,97 @@
+I'm now going to show you how to make a dissolve shader. A dissolve effect looks like this <show example picture>, and is commonly used as an effect on ragdolls.
+
+The way the effect works is comparing a noise texture to a cutoff value, and outputting either the texture, a solid color, or a fully transparent color based on the result.
+
+So, to start, let's copy over our previous shader and add the necessary parameters.
+
+new shader, <Custom/Dissolve>
+
+add 
+<
+		_ThresholdMap ("ThresholdMap (Greyscale)", 2D) = "white" {}
+        _AlphaThreshold ("Transparency Threshold", Range(0, 1)) = 0.5
+        _ColorOffset ("Solid Color Offset (from Transparency)", Range(0, 0.5)) = 0.1
+>
+
+we need a second texture input for our threshold noise texture, a float input to indicate the current threshold value, and a second float input for the width of the solid color.
+
+And as before, we also need to declare these in our CGPROGRAM block:
+
+add
+<
+				sampler2D _ThresholdMap;
+                fixed _AlphaThreshold;
+                fixed _ColorOffset;
+>
+
+First, let's get transparency cutoff working, and add color cutoff later. Now, normally this would be a straightforward if/elseif/else block. However, I want to show you how to do this without branches, 
+since branch instructions can sometimes be quite expensive on certain hardware. This also allows me to give you a brief introduction to some of the built-in functions of CG. There is reference documentation for these built-in functions
+at http://http.developer.nvidia.com/CgTutorial/cg_tutorial_appendix_e.html . The main functions we will use are step() and lerp().
+
+add
+<
+fixed4 textureCol = tex2D(_MainTex, i.uv);
+
+fixed testValue = tex2D(_ThresholdMap, i.uv).r;
+fixed alphaThresholdPassed = step(_AlphaThreshold, testValue);
+
+fixed4 outputColor = textureCol;
+outputColor.a *= alphaThresholdPassed; 
+return outputColor;
+
+>
+
+The first built-in function, step, returns 1 if the second value is greater than the first, and 0 otherwise. If it is 1, the alpha value will not be modified. If it is zero, the alpha will be set to zero.
+
+<Create material, demonstrate>
+
+Now to add color:
+add
+<
+fixed colorThresholdPassed = step(_AlphaThreshold + _ColorOffset, testValue);
+
+fixed4 solidColor = fixed4(_Color.rgb, _Color.a * textureCol.a);
+fixed4 outputColor = lerp(solidColor, textureCol, colorThresholdPassed);
+
+>
+
+similar to the alphaThreshold, colorThresholdPassed will be 1 if we passed the threshold, and zero if we failed. the lerp() function performs a linear interpolation between the first and second parameters based on the third.
+If we passed the colorThreshold, it'll return the texture color, otherwise it'll return the solid color.
+
+<demonstrate>
+
+Now, you'll notice that every single object with the same material has the same alphaThreshold. This isn't what we want, since various objects will be is different states of decay. The way we solve this is my using MaterialPropertyBlocks
+
+<Mark thresholds with [PerRendererData]>
+
+Marking a property with a [PerRendererData] attribute specifies that the attribute is specified by the renderer, not the material. The SpriteRenderer does this with _MainTex, so you can set the sprite on the renderer instead of needing a new material for each sprite.
+
+To set this parameter, we need to write a C# script. For simplicity, I'll make the progress based off of Time.time
+
+<
+[RequireComponent(typeof(Renderer))]
+public class DissolveScript : MonoBehaviour {
+
+    Renderer rend;
+
+    [SerializeField]
+    protected float animationDuration = 1.0f;
+
+	void Start () {
+        rend = GetComponent<Renderer>();
+	}
+	
+	void Update () {
+        MaterialPropertyBlock instancedData = new MaterialPropertyBlock();
+        float alphaThreshold = (Time.time / animationDuration) % 1;
+        instancedData.SetFloat("_AlphaThreshold", alphaThreshold);
+
+        float colorOffset = Mathf.Min(alphaThreshold, 1 - alphaThreshold); //value is the distance to the nearest whole number
+        colorOffset /= 4; //scale the output range from [0..0.5] to [0..0.125]
+        instancedData.SetFloat("_ColorOffset", colorOffset);
+
+        rend.SetPropertyBlock(instancedData);
+	}
+}
+
+>

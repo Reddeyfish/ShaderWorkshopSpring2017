@@ -1,0 +1,65 @@
+We now have a shader which outputs a solid color, but we want other things, like textures
+
+This is done by adding a properties block at the top of the shader.
+
+<New Shader, Custom/Properties>
+
+<Add
+    Properties {
+		_Color ("Color (RGBA)", Color) = (1,1,1,1)
+		_MainTex ("Texture (RGBA)", 2D) = "white" {}
+	}
+>
+
+This adds two properties to our shader. The first is a color, the other is a texture. For a list of other properties you can add, see
+https://docs.unity3d.com/Manual/SL-Properties.html .
+
+The other two main types are Floats and Vectors <highlight in reference document>
+
+The leftmost _Color is the name of the property (with the underscore by convention). The string is the display name in the inspector, the next determines the type, and the last is the default value
+
+I'm going to include the color first. Before you can actually use a property, you need to declare it somewhere in the CGPROGRAM block
+
+<add fixed4 _Color;>
+
+after that, you can use it like a class variable;
+
+change return to <return _Color;>
+
+<create material, demonstrate property>
+
+Textures are slightly more complex.
+
+<add sampler2D _MainTex>
+
+to use a texture, you call the function tex2D()
+
+<add 
+fixed4 textureCol = tex2D(_MainTex, i.uv);
+return textureCol;
+>
+
+the second parameter to this function is the UV coordinate where you want to sample the texture. (0, 0) is the bottom left, (1, 1) is the top right.
+
+The UVs we are using here come from our vertex shader, and originated as per-vertex mesh data which is interpolated.
+The input value is a 2D vector, so you can do things like this:
+
+<Change to i.uv.yx>, which will flip the x and y axis.
+
+Vectors in CG have syntax which allows you to access their components, and rearrange them
+
+Note that our colors are also stored as vectors, so you can also use them as inputs:
+
+<change to _Color.rg>
+
+For vectors.you can use .rgba or .xyzw interchangably, so we can also do <i.uv.rg>, and it'll do the same thing we had originally.
+
+To turn this shader into something usable, we'll tint the texture color by the color property.
+
+<change to
+					fixed4 textureCol = tex2D(_MainTex, i.uv);
+                    //sample from the current texture
+                    return _Color * textureCol; //return tinted texture color
+>
+
+This is effectively your default sprite shader.
