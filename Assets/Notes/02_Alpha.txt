@@ -1,7 +1,10 @@
 To have the shader take alpha into account, we need to add a few lines.
 <New Shader, Custom/Alpha>
 
-<Add
+In subshader
+
+<Add to SubShader
+
 	Blend SrcAlpha OneMinusSrcAlpha
 	ZWrite Off
 	ZTest LEqual
@@ -16,3 +19,10 @@ ZTest states that we'll only render if we are closer to the camera than any occl
 ZWrite off states that the rendered object won't occlude objects.
 
 <Create Material, apply it>
+
+We also need to set up a tags block to tell Unity to render this shader with other transparent shaders
+
+<add to Subshader
+	Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector" = "True" "PreviewType"="Plane" }
+
+>

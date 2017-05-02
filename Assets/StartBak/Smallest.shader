@@ -1,4 +1,4 @@
-﻿Shader "Custom/Alpha" {
+﻿Shader "CustomBak/Smallest" {
 
     SubShader
     {
@@ -22,7 +22,7 @@
                     //v2f_img defined in UnityCG.cginc, and is the output struct of our vertex function
                     // : SV_Target semantic marks the return value as the color of the fragment.
 
-                    fixed4 col = fixed4(1, 0, 0, 0.5);
+                    fixed4 col = fixed4(1, 0, 0, 1);
                     return col;
                 }
             ENDCG

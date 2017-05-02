@@ -6,7 +6,7 @@ So, to start, let's copy over our previous shader and add the necessary paramete
 
 new shader, <Custom/Dissolve>
 
-add 
+add to Properties
 <
 		_ThresholdMap ("ThresholdMap (Greyscale)", 2D) = "white" {}
         _AlphaThreshold ("Transparency Threshold", Range(0, 1)) = 0.5
@@ -28,16 +28,16 @@ First, let's get transparency cutoff working, and add color cutoff later. Now, n
 since branch instructions can sometimes be quite expensive on certain hardware. This also allows me to give you a brief introduction to some of the built-in functions of CG. There is reference documentation for these built-in functions
 at http://http.developer.nvidia.com/CgTutorial/cg_tutorial_appendix_e.html . The main functions we will use are step() and lerp().
 
-add
+add to frag
 <
-fixed4 textureCol = tex2D(_MainTex, i.uv);
+	fixed4 textureCol = tex2D(_MainTex, i.uv);
 
-fixed testValue = tex2D(_ThresholdMap, i.uv).r;
-fixed alphaThresholdPassed = step(_AlphaThreshold, testValue);
+	fixed testValue = tex2D(_ThresholdMap, i.uv).r;
+	fixed alphaThresholdPassed = step(_AlphaThreshold, testValue);
 
-fixed4 outputColor = textureCol;
-outputColor.a *= alphaThresholdPassed; 
-return outputColor;
+	fixed4 outputColor = textureCol;
+	outputColor.a *= alphaThresholdPassed; 
+	return outputColor;
 
 >
 
@@ -46,12 +46,12 @@ The first built-in function, step, returns 1 if the second value is greater than
 <Create material, demonstrate>
 
 Now to add color:
-add
+add to fragment
 <
-fixed colorThresholdPassed = step(_AlphaThreshold + _ColorOffset, testValue);
+	fixed colorThresholdPassed = step(_AlphaThreshold + _ColorOffset, testValue);
 
-fixed4 solidColor = fixed4(_Color.rgb, _Color.a * textureCol.a);
-fixed4 outputColor = lerp(solidColor, textureCol, colorThresholdPassed);
+	fixed4 solidColor = fixed4(_Color.rgb, _Color.a * textureCol.a);
+	fixed4 outputColor = lerp(solidColor, textureCol, colorThresholdPassed);
 
 >
 
@@ -60,9 +60,9 @@ If we passed the colorThreshold, it'll return the texture color, otherwise it'll
 
 <demonstrate>
 
-Now, you'll notice that every single object with the same material has the same alphaThreshold. This isn't what we want, since various objects will be is different states of decay. The way we solve this is my using MaterialPropertyBlocks
+Now, you'll notice that every single object with the same material has the same alphaThreshold. This isn't what we want, since various objects will be is different states of decay. The way we solve this is by using MaterialPropertyBlocks
 
-<Mark thresholds with [PerRendererData]>
+<Mark thresholds with [PerRendererData] in properties>
 
 Marking a property with a [PerRendererData] attribute specifies that the attribute is specified by the renderer, not the material. The SpriteRenderer does this with _MainTex, so you can set the sprite on the renderer instead of needing a new material for each sprite.
 

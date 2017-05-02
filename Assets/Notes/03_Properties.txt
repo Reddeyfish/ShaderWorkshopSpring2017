@@ -1,4 +1,4 @@
-We now have a shader which outputs a solid color, but we want other things, like textures
+We now have a shader which outputs a solid color, but we want other things, like textures.
 
 This is done by adding a properties block at the top of the shader.
 
@@ -20,7 +20,9 @@ The leftmost _Color is the name of the property (with the underscore by conventi
 
 I'm going to include the color first. Before you can actually use a property, you need to declare it somewhere in the CGPROGRAM block
 
-<add fixed4 _Color;>
+<add 
+	fixed4 _Color;
+>
 
 after that, you can use it like a class variable;
 
@@ -30,13 +32,15 @@ change return to <return _Color;>
 
 Textures are slightly more complex.
 
-<add sampler2D _MainTex>
+<add 
+	sampler2D _MainTex;
+>
 
 to use a texture, you call the function tex2D()
 
-<add 
-fixed4 textureCol = tex2D(_MainTex, i.uv);
-return textureCol;
+<add to frag
+	fixed4 textureCol = tex2D(_MainTex, i.uv);
+	return textureCol;
 >
 
 the second parameter to this function is the UV coordinate where you want to sample the texture. (0, 0) is the bottom left, (1, 1) is the top right.

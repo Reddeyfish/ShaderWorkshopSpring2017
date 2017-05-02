@@ -3,8 +3,8 @@ There are other attributes besides [PerRendererData]. For example, currently the
 
 <new shader, <Custom/Dissolve>>, copied from Properties
 
-<add
-                uniform float4 _MainTex_ST;
+<add 
+                float4 _MainTex_ST;
 >
 
 We can also declare a float4 _MainTex_ST, which will contain the scale and offset values from the inspector.
