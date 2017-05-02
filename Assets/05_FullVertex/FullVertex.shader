@@ -2,7 +2,7 @@
 
     Properties {
 		_Color ("Color (RGBA)", Color) = (1,1,1,1)
-		[NoScaleOffset] _MainTex ("Texture (RGBA)", 2D) = "white" {}
+		_MainTex ("Texture (RGBA)", 2D) = "white" {}
 	}
 
     SubShader
@@ -22,7 +22,7 @@
                 //begin CG block
 
                 #pragma vertex vert
-                //we will use a vertex function, named "vert". vert_img is defined in UnityCG.cginc
+                //we will use a vertex function, named "vert".
 
                 #pragma fragment frag
                 //we will use a fragment function, named "frag"
@@ -33,6 +33,7 @@
                 //declare our external properties
                 uniform fixed4 _Color;
                 uniform sampler2D _MainTex;
+                uniform float4 _MainTex_ST;
 
                 //declare input and output structs for vertex and fragment functions
 
@@ -52,7 +53,7 @@
                 {
                     v2f o;
                     o.pos = UnityObjectToClipPos (v.vertex);
-                    o.uv = v.texcoord;
+                    o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
                     return o;
                 }
 

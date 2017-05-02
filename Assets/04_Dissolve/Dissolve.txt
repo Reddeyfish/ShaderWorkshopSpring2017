@@ -1,3 +1,58 @@
 There are other attributes besides [PerRendererData]. For example, currently the scale and offset inputs don't actually do anything. We can remove these using the
 [NoScaleOffset] attribute, but we can also make them functional by adding a vertex function.
 
+<new shader, <Custom/Dissolve>>, copied from Properties
+
+<add
+                uniform float4 _MainTex_ST;
+>
+
+We can also declare a float4 _MainTex_ST, which will contain the scale and offset values from the inspector.
+We're adding a new vertex function, so change                 #pragma vertex vert
+
+For starters, we'll copy the v2f_img struct and vert_img function from UnityCG.cginc
+
+<copy
+                v2f_img vert_img( appdata_img v )
+				{
+					v2f_img o;
+					o.pos = UnityObjectToClipPos (v.vertex);
+					o.uv = v.texcoord;
+					return o;
+				}
+
+>
+
+The code takes in appdata_img as input, and returns a v2f_img. We can also copy both of those from UnityCG.cginc
+
+<copy
+
+
+                struct appdata_img
+                {
+                    float4 vertex : POSITION;
+                    half2 texcoord : TEXCOORD0;
+                };
+
+                struct v2f_img
+                {
+                    float4 pos : SV_POSITION;
+                    half2 uv : TEXCOORD0;
+                }
+
+>
+
+and them we'll remove _img from everything.
+
+The function UnityObjectToClipPos() uses matrix multiplication converts the vertex position stored in object space to a vertex position in what's called clip space, which is similar to screen-space.
+Currently, the UV coordinates for texture sampling are copied directly. To implement scale and offset, we want to change that. Unity has a built-in macro TRANSFORM_TEX which does that for us.
+
+<change
+
+	             o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+
+>
+
+Again, this is defined in UnityCG.cginc if you want to see the underlying code.
+
+<Create material, demonstrate>
