@@ -1,4 +1,4 @@
-﻿Shader "Custom/Properties" {
+﻿Shader "Completed/Properties" {
 
     Properties {
 		_Color ("Color (RGBA)", Color) = (1,1,1,1)
@@ -21,8 +21,8 @@
             CGPROGRAM
                 //begin CG block
 
-                #pragma vertex vert_img
-                //we will use a vertex function, named "vert_img". vert_img is defined in UnityCG.cginc
+                #pragma vertex vert
+                //we will use a vertex function, named "vert".
 
                 #pragma fragment frag
                 //we will use a fragment function, named "frag"
@@ -33,10 +33,32 @@
                 //declare our external properties
                 uniform fixed4 _Color;
                 uniform sampler2D _MainTex;
+                uniform float4 _MainTex_ST;
 
-                fixed4 frag (v2f_img i) : SV_Target
+                //declare input and output structs for vertex and fragment functions
+
+                struct appdata
                 {
-                    //v2f_img defined in UnityCG.cginc, and is the output struct of our vertex function
+                    float4 vertex : POSITION;
+                    half2 texcoord : TEXCOORD0;
+                };
+
+                struct v2f
+                {
+                    float4 pos : SV_POSITION;
+                    half2 uv : TEXCOORD0;
+                };
+
+                v2f vert( appdata v )
+                {
+                    v2f o;
+                    o.pos = UnityObjectToClipPos (v.vertex);
+                    o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+                    return o;
+                }
+
+                fixed4 frag (v2f i) : SV_Target
+                {
                     // : SV_Target semantic marks the return value as the color of the fragment.
 
                     fixed4 textureCol = tex2D(_MainTex, i.uv);

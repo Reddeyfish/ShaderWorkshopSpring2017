@@ -1,0 +1,66 @@
+Now, I'm going to show some basic visual effects using custom vertex shaders. One common tool for creating visual effects is to have your textures move.
+
+<new shader, <Custom/Distortion>>
+
+I'm going to do this with an additional texture property, since I'll be using the main texture for something else later.
+
+<Add
+        _DistortionTex ("Distortion Texture (RG)", 2D) = "bump" {}
+
+                uniform sampler2D _DistortionTex;
+                uniform float4 _DistortionTex_ST;
+
+				
+                    half2 shiftedUvs : TEXCOORD1
+
+					
+                    o.shiftedUvs.xy = TRANSFORM_TEX(v.texcoord, _DistortionTex) + _Time.xx;
+
+					return tex2D(_DistortionTex, i.shiftedUvs.xy);
+>
+
+Unity has a time value built in as _Time. These UVs will be shifted over time.
+
+
+
+<Create new Material, demonstrate>
+
+Also, note that the texture mode needs to be set to wrap. Otherwise, you get problems <demonstrate>
+
+Now, this texture is clearly moving to the bottom-left. If you want to have a texture appear to be changing, but without any discernable direction, you have a second texture move in the opposite direction, and combine the two values.
+For this, we'll use the same base texture, with a different set of moving UVs.
+
+<add
+					change half2 to half4
+
+                    o.shiftedUvs.zw = TRANSFORM_TEX(v.texcoord, _DistortionTex) - _Time.xx + half2(0.5, 0.5); //second set of time-shifted displacement UVs
+
+>
+These UVs have time subtracted instead of added, so they'll move in the opposite direction. They're also offset by 0.5 (half), to avoid an artifact where both textures overlap perfectly.
+
+<add
+
+	return (tex2D(_DistortionTex, i.shiftedUvs.xy) + tex2D(_DistortionTex, i.shiftedUvs.zw)) / 2;
+
+	>
+
+<demonstrate>
+
+The animated texture doesn't need to be output directly. One common technique is to use it as a tint or mask on a main texture.
+
+<add
+		fixed4 animatedTint = return (tex2D(_DistortionTex, i.shiftedUvs.xy) + tex2D(_DistortionTex, i.shiftedUvs.zw)) / 2;
+		return _Color * animatedTint * textureCol;
+>
+
+<demonstrate>
+
+Another technique that I find interesting is to use the animated texture value to modify the UVs at which you sample the main texture.
+
+<add
+		half2 distortion = tex2D(_DistortionTex, i.shiftedUvs.xy).rg + tex2D(_DistortionTex, i.shiftedUvs.zw).rg;
+		distortion *= 0.05;
+		fixed4 textureCol = tex2D(_MainTex, i.uv + distortion);
+>
+
+<demonstrate>

@@ -1,10 +1,17 @@
-﻿Shader "Custom/Smallest" {
+﻿Shader "Completed/Alpha" {
 
     SubShader
     {
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector" = "True" "PreviewType"="Plane" }
+
         //subshaders are used for compatibility. If the first subshader isn't compatible, it'll attempt to use the one below it.
         Pass
         {
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
+            ZTest LEqual
+            Lighting Off
+
             CGPROGRAM
                 //begin CG block
 
@@ -22,7 +29,7 @@
                     //v2f_img defined in UnityCG.cginc, and is the output struct of our vertex function
                     // : SV_Target semantic marks the return value as the color of the fragment.
 
-                    fixed4 col = fixed4(1, 0, 0, 1);
+                    fixed4 col = fixed4(1, 0, 0, 0.5);
                     return col;
                 }
             ENDCG

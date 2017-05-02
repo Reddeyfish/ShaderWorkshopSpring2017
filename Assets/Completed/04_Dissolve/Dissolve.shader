@@ -1,4 +1,4 @@
-﻿Shader "Custom/Dissolve" {
+﻿Shader "Completed/Dissolve" {
 
     Properties {
 		_Color ("Color (RGBA)", Color) = (1,1,1,1)

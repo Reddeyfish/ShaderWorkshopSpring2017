@@ -2,16 +2,9 @@
 
     SubShader
     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector" = "True" "PreviewType"="Plane" }
-
         //subshaders are used for compatibility. If the first subshader isn't compatible, it'll attempt to use the one below it.
         Pass
         {
-            Blend SrcAlpha OneMinusSrcAlpha
-            ZWrite Off
-            ZTest LEqual
-            Lighting Off
-
             CGPROGRAM
                 //begin CG block
 

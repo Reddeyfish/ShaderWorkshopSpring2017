@@ -1,0 +1,18 @@
+To have the shader take alpha into account, we need to add a few lines.
+<New Shader, Custom/Alpha>
+
+<Add
+	Blend SrcAlpha OneMinusSrcAlpha
+	ZWrite Off
+	ZTest LEqual
+	Lighting Off
+>
+
+These keywords set up the shader to use alpha blending. Once the object has been rendered, it needs to be combined with the scene.
+The resulting color is the rendered color times it's alpha, plus the background color times oneMinusSourceAlpha. You can set up different blending modes.
+For example, Additive blending is Blend One One to add the two together.
+
+ZTest states that we'll only render if we are closer to the camera than any occluding objects.
+ZWrite off states that the rendered object won't occlude objects.
+
+<Create Material, apply it>
